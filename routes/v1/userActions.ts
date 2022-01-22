@@ -12,6 +12,7 @@ const client = new MongoClient(uri, {
 });
 
 export type UserData = {
+    _id?: number;
     userName: string;
     userPassword: string;
     userEmail: string;
@@ -37,6 +38,13 @@ export default class UserActions {
         const searchResult = await this.collection.find(searchItem);
         const array = await searchResult.toArray();
         return array;
+    }
+
+    public async generateId() {
+        const searchResult = await this.collection.find();
+        const array = await searchResult.toArray();
+        console.log(`Current length: ${array.length}`);
+        return array.length;
     }
 
     async checkForDuplicateAttribute(userData: UserData) {
@@ -71,6 +79,7 @@ export default class UserActions {
                 try {
                     // Set data into database
                     const userData: UserData = {
+                        _id: await this.generateId(),
                         userName: req.body.userName,
                         userPassword: req.body.userPassword,
                         userEmail: req.body.userEmail,
