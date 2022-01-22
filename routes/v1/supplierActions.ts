@@ -2,7 +2,6 @@ import * as express from 'express';
 import { Request, Response } from 'express';
 import { MongoClient } from 'mongodb';
 import multer from 'multer';
-import { FriendObject } from './friendsHandler.api';
 
 const uri =
     'mongodb+srv://MinistryOfMetaMask:eF28WeXha7n3Y8DV@cluster0.6i8am.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
@@ -20,25 +19,12 @@ export type SupplierData = {
     supplierAddress: string;
 };
 
-export type UserData = {
-    userName: string;
-    userPassword: string;
-    userEmail: string;
-    userWalletAddress: string;
-    userDeliveryAddress: string;
-    friends: {
-        sentRequests: Array<FriendObject>;
-        pending: Array<FriendObject>;
-        confirmed: Array<FriendObject>;
-    };
-};
-
-export default class UserActions {
+export default class SupplierActions {
     collection: any;
 
     constructor() {
         client.connect((err) => {
-            this.collection = client.db('NomNom').collection('Users');
+            this.collection = client.db('NomNom').collection('Suppliers');
         });
     }
 
@@ -48,54 +34,53 @@ export default class UserActions {
         return array;
     }
 
+    async checkForDuplicateAttributes(supplierData: SupplierData) {
+        // Check if userName (unique), wallet address have been used before
+        const supplierNameArray = await this.searchDatabase({
+            supplierName: supplierData.supplierName,
+        });
+        if (supplierNameArray.length > 0) {
+            throw new Error('Username already exists');
+        }
+        // Check email
+        const supplierEmailArray = await this.searchDatabase({
+            supplierEmail: supplierData.supplierEmail,
+        });
+        if (supplierEmailArray.length > 0) {
+            throw new Error('Email already exists');
+        }
+        // Check wallet address
+        const supplierWalletAddressArray = await this.searchDatabase({
+            supplierWalletAddress: supplierData.supplierWalletAddress,
+        });
+        if (supplierWalletAddressArray.length > 0) {
+            throw new Error('Wallet address already exists');
+        }
+    }
+
     public routes(router: express.Router): void {
         // POST create
         router.post(
-            '/signup',
+            '/supplier/signup',
             multer().none(),
             async (req: Request, res: Response) => {
                 try {
                     // Set data into database
-                    const userData: UserData = {
-                        userName: req.body.userName,
-                        userPassword: req.body.userPassword,
-                        userEmail: req.body.userEmail,
-                        userWalletAddress: req.body.userWalletAddress,
-                        userDeliveryAddress: req.body.userDeliveryAddress,
-                        friends: {
-                            sentRequests: [],
-                            pending: [],
-                            confirmed: [],
-                        },
+                    const supplierData: SupplierData = {
+                        _id: req.body._id,
+                        supplierName: req.body.supplierName,
+                        supplierPassword: req.body.supplierPassword,
+                        supplierEmail: req.body.supplierEmail,
+                        supplierWalletAddress: req.body.supplierWalletAddress,
+                        supplierAddress: req.body.supplierAddress,
                     };
-                    // Check if userName (unique), wallet address have been used before
-                    const usernameArray = await this.searchDatabase({
-                        userName: req.body.username,
-                    });
-                    if (usernameArray.length > 0) {
-                        throw new Error('Username already exists');
-                    }
-                    // Check email
-                    const emailArray = await this.searchDatabase({
-                        userEmail: req.body.email,
-                    });
-                    if (emailArray.length > 0) {
-                        throw new Error('Email already exists');
-                    }
-                    // Check wallet address
-                    const walletAddressArray = await this.searchDatabase({
-                        userWalletAddress: req.body.walletAddress,
-                    });
-                    if (walletAddressArray.length > 0) {
-                        throw new Error('Wallet address already exists');
-                    }
 
                     // No repeats, proceed to insert
-                    await this.collection.insertOne(userData);
+                    await this.collection.insertOne(supplierData);
                     res.send({
                         isOk: true,
-                        userProfile: userData,
-                        message: 'Sign up successful',
+                        supplierProfile: supplierData,
+                        message: 'Supplier sign up successful',
                     }).status(200);
                     return;
                 } catch (err: any) {
@@ -109,31 +94,34 @@ export default class UserActions {
         );
 
         router.post(
-            '/signin',
+            '/supplier/signin',
             multer().none(),
             async (req: Request, res: Response) => {
                 try {
-                    const userId = req.body.userId;
-                    const userPassword = req.body.userPassword;
+                    const supplierName = req.body.supplierName;
+                    const supplierPassword = req.body.supplierPassword;
                     // Retrieve details from database
-                    let userDetails = await this.searchDatabase({
-                        userName: userId,
-                    });
-                    // Check if user exists, if not use email
-                    if (userDetails.length === 0) {
-                        console.log('Cannot find username, searching email');
-                        userDetails = await this.searchDatabase({
-                            userEmail: userId,
+                    let supplierDetails: SupplierData[] =
+                        await this.searchDatabase({
+                            userName: supplierName,
                         });
-                        if (userDetails.length === 0) {
+                    // Check if user exists, if not use email
+                    if (supplierDetails.length === 0) {
+                        console.log('Cannot find username, searching email');
+                        supplierDetails = await this.searchDatabase({
+                            supplierEmail: supplierName,
+                        });
+                        if (supplierDetails.length === 0) {
                             throw new Error('User not found');
                         }
                     }
                     // Check if password is correct
-                    if (userPassword === userDetails[0].userPassword) {
+                    if (
+                        supplierPassword === supplierDetails[0].supplierPassword
+                    ) {
                         res.send({
                             loginOk: true,
-                            userProfile: userDetails[0],
+                            supplierProfile: supplierDetails[0],
                             message: 'Login success',
                         }).status(200);
                     }
@@ -141,7 +129,6 @@ export default class UserActions {
                 } catch (err: any) {
                     res.send({
                         loginOk: false,
-                        userProfile: null,
                         message: err.message,
                     }).status(403);
                 }

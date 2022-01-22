@@ -29,7 +29,7 @@ export default class UserActions {
 
     constructor() {
         client.connect((err) => {
-            this.collection = client.db('NomNom').collection('Suppliers');
+            this.collection = client.db('NomNom').collection('Users');
         });
     }
 
@@ -135,7 +135,6 @@ export default class UserActions {
                 } catch (err: any) {
                     res.send({
                         loginOk: false,
-                        userProfile: null,
                         message: err.message,
                     }).status(403);
                 }
