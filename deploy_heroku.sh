@@ -1,6 +1,6 @@
 #! /bin/bash
-heroku container:push --app=mommon-api web
-heroku container:release --app=mommon-api web
+heroku container:push --app=nomnom-api1 web
+heroku container:release --app=nomnom-api1 web
 
 
 # Login before running commands above
