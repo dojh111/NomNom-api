@@ -1,9 +1,8 @@
-import { string } from '@hapi/joi';
 import * as express from 'express';
 import { Request, Response } from 'express';
 import { MongoClient } from 'mongodb';
 import multer from 'multer';
-import { FriendObject } from './friendsHandler';
+import { FriendObject } from './friendsHandler.api';
 
 const uri =
     'mongodb+srv://MinistryOfMetaMask:eF28WeXha7n3Y8DV@cluster0.6i8am.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
@@ -12,7 +11,7 @@ const client = new MongoClient(uri, {
     useUnifiedTopology: true,
 });
 
-type UserData = {
+export type UserData = {
     userName: string;
     userPassword: string;
     userEmail: string;
