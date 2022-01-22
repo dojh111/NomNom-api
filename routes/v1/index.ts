@@ -11,6 +11,7 @@ import BlockchainTrackerApi from './blockchainTrackerApi';
 import Food from './food';
 import Restaurant from './restaurant';
 import FriendsHandlerApi from './friendsHandler.api';
+import ExchangeRateApi from './exchangeRateApi';
 
 // Creating new Routes Instances.
 const healthRoute: HealthChecker = new HealthChecker();
@@ -21,6 +22,7 @@ const blockchainTrackerApiRoute: BlockchainTrackerApi =
 const foodRoute: Food = new Food();
 const restaurantRoute: Restaurant = new Restaurant();
 const friendsHandlerApiRoute: FriendsHandlerApi = new FriendsHandlerApi();
+const exchangeRateApiRoute: ExchangeRateApi = new ExchangeRateApi();
 
 // Registering our Routes.
 healthRoute.routes(router);
@@ -30,5 +32,6 @@ blockchainTrackerApiRoute.routes(router);
 foodRoute.routes(router);
 restaurantRoute.routes(router);
 friendsHandlerApiRoute.routes(router);
+exchangeRateApiRoute.routes(router);
 
 export default router;
