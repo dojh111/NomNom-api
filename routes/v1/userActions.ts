@@ -39,6 +39,29 @@ export default class UserActions {
         return array;
     }
 
+    async checkForDuplicateAttribute(userData: UserData) {
+        const usernameArray = await this.searchDatabase({
+            userName: userData.userName,
+        });
+        if (usernameArray.length > 0) {
+            throw new Error('Username already exists');
+        }
+        // Check email
+        const emailArray = await this.searchDatabase({
+            userEmail: userData.userEmail,
+        });
+        if (emailArray.length > 0) {
+            throw new Error('Email already exists');
+        }
+        // Check wallet address
+        const walletAddressArray = await this.searchDatabase({
+            userWalletAddress: userData.userWalletAddress,
+        });
+        if (walletAddressArray.length > 0) {
+            throw new Error('Wallet address already exists');
+        }
+    }
+
     public routes(router: express.Router): void {
         // POST create
         router.post(
@@ -60,27 +83,7 @@ export default class UserActions {
                         },
                     };
                     // Check if userName (unique), wallet address have been used before
-                    const usernameArray = await this.searchDatabase({
-                        userName: req.body.username,
-                    });
-                    if (usernameArray.length > 0) {
-                        throw new Error('Username already exists');
-                    }
-                    // Check email
-                    const emailArray = await this.searchDatabase({
-                        userEmail: req.body.email,
-                    });
-                    if (emailArray.length > 0) {
-                        throw new Error('Email already exists');
-                    }
-                    // Check wallet address
-                    const walletAddressArray = await this.searchDatabase({
-                        userWalletAddress: req.body.walletAddress,
-                    });
-                    if (walletAddressArray.length > 0) {
-                        throw new Error('Wallet address already exists');
-                    }
-
+                    await this.checkForDuplicateAttribute(userData);
                     // No repeats, proceed to insert
                     await this.collection.insertOne(userData);
                     res.send({
