@@ -1,5 +1,3 @@
-import * as express from 'express';
-import { Request, Response } from 'express';
 import { ethers } from 'ethers';
 import Market from '../../ethereum/Market.sol/Market.json';
 import { MongoClient, ObjectId } from 'mongodb';
@@ -20,7 +18,7 @@ export default class BlockchainTracker {
         const rinkebyUrl =
             'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161';
         this.provider = new ethers.providers.JsonRpcProvider(rinkebyUrl);
-        // Create Contracts
+        // Create Contract
         const marketContractAddress =
             '0xE5B885Cb0d8dBF8B69f33CcB3BC4774a47eCd2e7';
         this.marketContract = new ethers.Contract(
@@ -67,7 +65,7 @@ export default class BlockchainTracker {
         return timeString;
     }
 
-    convertTimeFromUnix(UNIXTimestamp: any): string {
+    public convertTimeFromUnix(UNIXTimestamp: any): string {
         let dateTime: string;
         const dateObject = new Date(UNIXTimestamp * 1000);
         const date = this.createDateString(dateObject);
@@ -76,13 +74,13 @@ export default class BlockchainTracker {
         return dateTime;
     }
 
-    async searchDatabase(searchItem: any) {
+    public async searchDatabase(searchItem: any) {
         const searchResult = await this.collection.find(searchItem);
         const array = await searchResult.toArray();
         return array;
     }
 
-    async getFoodDetails(foodID: any) {
+    public async getFoodDetails(foodID: any) {
         const foodDetails = await this.searchDatabase({
             _id: new ObjectId(foodID),
         });
@@ -92,7 +90,7 @@ export default class BlockchainTracker {
         return foodDetails[0];
     }
 
-    async addFoodNames(logs: any[], userAddress: string) {
+    public async addFoodNames(logs: any[], userAddress: string) {
         const formattedLogs: any = [];
         return Promise.all(
             logs.map(async (event) => {
@@ -120,7 +118,7 @@ export default class BlockchainTracker {
         });
     }
 
-    async formatAndAddNames(logs: any[], userAddress: string) {
+    public async formatAndAddNames(logs: any[], userAddress: string) {
         const formattedLogs: any = [];
         return Promise.all(
             logs.map(async (event) => {
@@ -144,163 +142,5 @@ export default class BlockchainTracker {
             console.log(formattedLogs);
             return formattedLogs;
         });
-    }
-
-    public routes(router: express.Router): void {
-        // Gets buy progress count
-        router.get(
-            '/buyprogress/:walletAddress',
-            async (req: Request, res: Response) => {
-                try {
-                    const userAddress = req.params.walletAddress;
-                    // Create filter for event
-                    const dataFilter =
-                        this.marketContract.filters.EventBoughtFood(
-                            userAddress
-                        );
-                    const startBlock = 0;
-                    const endBlock = await this.provider.getBlockNumber();
-                    const logs = await this.marketContract.queryFilter(
-                        dataFilter,
-                        startBlock,
-                        endBlock
-                    );
-                    const logArray = [...logs];
-                    const buyCount = logArray.length;
-                    const data = await this.formatAndAddNames(
-                        logArray,
-                        userAddress
-                    );
-                    console.log('DATA HERE');
-                    console.log(data);
-                    res.send({
-                        count: buyCount,
-                        data: data,
-                        message: 'Success',
-                    }).status(200);
-                } catch (err: any) {
-                    console.log(err.message);
-                    res.send({
-                        count: 0,
-                        data: '',
-                        message: err.message,
-                    }).status(500);
-                }
-            }
-        );
-
-        router.get(
-            '/receivedgifts/:walletAddress',
-            async (req: Request, res: Response) => {
-                try {
-                    const userAddress = req.params.walletAddress;
-                    // Create filter for event
-                    const dataFilter =
-                        this.marketContract.filters.EventGiftFood(
-                            null,
-                            userAddress
-                        );
-                    const startBlock = 0;
-                    const endBlock = await this.provider.getBlockNumber();
-                    const logs = await this.marketContract.queryFilter(
-                        dataFilter,
-                        startBlock,
-                        endBlock
-                    );
-                    const logArray = [...logs];
-                    const receivedCount = logArray.length;
-
-                    //const data = await this.addFoodNames(logArray, userAddress);
-                    res.send({
-                        count: receivedCount,
-                        data: '',
-                        message: 'Success',
-                    }).status(200);
-                } catch (err: any) {
-                    console.log(err.message);
-                    res.send({
-                        count: 0,
-                        data: '',
-                        message: err.message,
-                    }).status(500);
-                }
-            }
-        );
-
-        router.get(
-            '/sentgifts/:walletAddress',
-            async (req: Request, res: Response) => {
-                try {
-                    const userAddress = req.params.walletAddress;
-                    // Create filter for event
-                    const dataFilter =
-                        this.marketContract.filters.EventGiftFood(userAddress);
-                    const startBlock = 0;
-                    const endBlock = await this.provider.getBlockNumber();
-                    const logs = await this.marketContract.queryFilter(
-                        dataFilter,
-                        startBlock,
-                        endBlock
-                    );
-                    const logArray = [...logs];
-                    const receivedCount = logArray.length;
-
-                    //const data = await this.addFoodNames(logArray, userAddress);
-                    res.send({
-                        count: receivedCount,
-                        data: '',
-                        message: 'Success',
-                    }).status(200);
-                } catch (err: any) {
-                    console.log(err.message);
-                    res.send({
-                        count: 0,
-                        data: '',
-                        message: err.message,
-                    }).status(500);
-                }
-            }
-        );
-
-        router.get(
-            '/redeemedgifts/:walletAddress',
-            async (req: Request, res: Response) => {
-                try {
-                    const userAddress = req.params.walletAddress;
-                    // Create filter for event
-                    const dataFilter =
-                        this.marketContract.filters.EventRedeemFood(
-                            userAddress
-                        );
-                    const startBlock = 0;
-                    const endBlock = await this.provider.getBlockNumber();
-                    const logs = await this.marketContract.queryFilter(
-                        dataFilter,
-                        startBlock,
-                        endBlock
-                    );
-                    const logArray = [...logs];
-                    const receivedCount = logArray.length;
-
-                    const data = await this.formatAndAddNames(
-                        logArray,
-                        userAddress
-                    );
-                    console.log(`Total redeem count: ${receivedCount}`);
-                    res.send({
-                        count: receivedCount,
-                        data: data,
-                        message: 'Success',
-                    }).status(200);
-                } catch (err: any) {
-                    console.log(err.message);
-                    res.send({
-                        count: 0,
-                        data: '',
-                        message: err.message,
-                    }).status(500);
-                }
-            }
-        );
     }
 }
