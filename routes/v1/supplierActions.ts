@@ -11,6 +11,15 @@ const client = new MongoClient(uri, {
     useUnifiedTopology: true,
 });
 
+export type SupplierData = {
+    _id?: number;
+    supplierName: string;
+    supplierPassword: string;
+    supplierEmail: string;
+    supplierWalletAddress: string;
+    supplierAddress: string;
+};
+
 export type UserData = {
     userName: string;
     userPassword: string;
@@ -29,7 +38,7 @@ export default class UserActions {
 
     constructor() {
         client.connect((err) => {
-            this.collection = client.db('NomNom').collection('Suppliers');
+            this.collection = client.db('NomNom').collection('Users');
         });
     }
 
