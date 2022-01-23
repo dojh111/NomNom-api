@@ -175,7 +175,7 @@
     },
     {
       "inputs": [],
-      "name": "getCustomerNomnomsToken",
+      "name": "getCustomerMommomsToken",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -298,10 +298,10 @@
     },
     {
       "inputs": [],
-      "name": "nomnom",
+      "name": "mommom",
       "outputs": [
         {
-          "internalType": "contract Nomnom",
+          "internalType": "contract Mommom",
           "name": "",
           "type": "address"
         }

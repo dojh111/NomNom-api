@@ -37,7 +37,7 @@ export default class Food {
     public routes(router: express.Router): void {
         // POST create
         router.post(
-            '/food',
+            'supplier/food',
             multer().none(),
             async (req: Request, res: Response) => {
                 try {

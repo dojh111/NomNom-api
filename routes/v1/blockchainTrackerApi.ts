@@ -32,8 +32,8 @@ export default class BlockchainTrackerApi extends BlockchainTracker {
                         logArray,
                         userAddress
                     );
-                    console.log('DATA HERE');
-                    console.log(data);
+                    // console.log('DATA HERE');
+                    // console.log(data);
                     res.send({
                         count: buyCount,
                         data: data,

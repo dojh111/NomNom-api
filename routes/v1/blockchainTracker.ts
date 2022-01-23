@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import Market from '../../ethereum/Market.sol/Market.json';
 import { MongoClient, ObjectId } from 'mongodb';
+import DateTimeParser from './dateTimeParser';
 
 const uri =
     'mongodb+srv://MinistryOfMetaMask:eF28WeXha7n3Y8DV@cluster0.6i8am.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
@@ -13,6 +14,7 @@ export default class BlockchainTracker {
     marketContract: ethers.Contract;
     provider: ethers.providers.JsonRpcProvider;
     collection: any;
+    dateTimeParser: DateTimeParser;
 
     constructor() {
         const rinkebyUrl =
@@ -26,52 +28,10 @@ export default class BlockchainTracker {
             Market.abi,
             this.provider
         );
+        this.dateTimeParser = new DateTimeParser();
         client.connect((err) => {
             this.collection = client.db('NomNom').collection('Food');
         });
-    }
-
-    parseDateTimeData(data: number[]): string[] {
-        const parsedData: string[] = [];
-        for (let number of data) {
-            if (number < 10) {
-                let tempNumber = '0' + number;
-                parsedData.push(tempNumber);
-                continue;
-            }
-            parsedData.push(number.toString());
-        }
-        return parsedData;
-    }
-
-    createDateString(dateObject: Date): string {
-        const year = dateObject.getFullYear();
-        const month = dateObject.getMonth() + 1;
-        const date = dateObject.getDate();
-        const dateData: number[] = [month, date];
-        const parsedData = this.parseDateTimeData(dateData);
-        const dateString = year + '-' + parsedData[0] + '-' + parsedData[1];
-        return dateString;
-    }
-
-    createTimeString(dateObject: Date): string {
-        const hour = dateObject.getHours();
-        const min = dateObject.getMinutes();
-        const sec = dateObject.getSeconds();
-        const dateData: number[] = [hour, min, sec];
-        const parsedData = this.parseDateTimeData(dateData);
-        const timeString =
-            parsedData[0] + ':' + parsedData[1] + ':' + parsedData[2];
-        return timeString;
-    }
-
-    public convertTimeFromUnix(UNIXTimestamp: any): string {
-        let dateTime: string;
-        const dateObject = new Date(UNIXTimestamp * 1000);
-        const date = this.createDateString(dateObject);
-        const time = this.createTimeString(dateObject);
-        dateTime = date + 'T' + time;
-        return dateTime;
     }
 
     public async searchDatabase(searchItem: any) {
@@ -106,7 +66,9 @@ export default class BlockchainTracker {
                         foodName: foodDetails.foodName,
                         foodImageUrl: foodDetails.foodImageUrl,
                         restaurantName: foodDetails.restaurantName,
-                        date: this.convertTimeFromUnix(event.args.date),
+                        date: this.dateTimeParser.convertTimeFromUnix(
+                            event.args.date
+                        ),
                         tokenID: event.args.tokenId,
                     };
                     formattedLogs.unshift(logData);
@@ -123,7 +85,6 @@ export default class BlockchainTracker {
         return Promise.all(
             logs.map(async (event) => {
                 if (event.hasOwnProperty('args') && event.args) {
-                    // console.log(event);
                     const foodDetails = await this.getFoodDetails(
                         event.args.foodID
                     );
@@ -132,7 +93,9 @@ export default class BlockchainTracker {
                         foodName: foodDetails.foodName,
                         foodImageUrl: foodDetails.foodImageUrl,
                         restaurantName: foodDetails.restaurantName,
-                        date: this.convertTimeFromUnix(event.args.date),
+                        date: this.dateTimeParser.convertTimeFromUnix(
+                            event.args.date
+                        ),
                         tokenID: event.args.tokenId.toString(),
                     };
                     formattedLogs.unshift(logData);

@@ -2,10 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import './Nomnom.sol';
+
+import './Mommom.sol';
 import './Reward.sol';
 
 contract Market {
+
     address payable admin;
 
     // WORK IN PROGRESS
@@ -33,14 +35,14 @@ contract Market {
         uint256 tokenId
     );
 
-    struct NomnomToken {
+    struct MommomToken {
         uint256 tokenID;
         bool redeemed;
     }
 
     struct Customer {
         uint256 buyCount;
-        uint256[] ownedNomnoms;
+        uint256[] ownedMommoms;
     }
 
     struct Food {
@@ -49,23 +51,19 @@ contract Market {
         uint256 stocks;
     }
 
-    Nomnom public Nomnom;
-    mapping(address => uint256) public lastTokenID;
-    mapping(address => uint256[]) public lastTokenList;
-    mapping(uint256 => NomnomToken) private nomnomTokens;
-    mapping(string => Food) public foods;
-    mapping(address => Customer) private customers;
+    Mommom public mommom;
+    mapping (address => uint256) public lastTokenID;
+    mapping (address => uint256[]) public lastTokenList;
+    mapping (uint256 => MommomToken) private mommomTokens;
+    mapping (string => Food) public foods;
+    mapping (address => Customer) private customers; 
 
     constructor() payable {
-        nomnom = new Nomnom();
+        mommom = new Mommom();
         admin = payable(msg.sender);
     }
 
-    function list(
-        string memory _foodID,
-        uint256 _stocks,
-        uint256 _price
-    ) public {
+    function list(string memory _foodID, uint256 _stocks, uint256 _price) public {
         Food memory food = Food({
             foodID: _foodID,
             stocks: _stocks,
@@ -74,41 +72,41 @@ contract Market {
         foods[_foodID] = food;
     }
 
-    function buy(string memory foodID) public payable returns (uint256) {
+    function buy(string memory foodID) public payable returns (uint256){
         Food storage food = foods[foodID];
-        require(msg.value >= food.price, 'Insufficient money');
-        require(food.stocks > 0, 'Insufficient stocks');
-        uint256 tokenID = nomnom.buy(msg.sender, foodID); // mint token
+        require(msg.value >= food.price, "Insufficient money");
+        require(food.stocks > 0, "Insufficient stocks");
+        uint256 tokenID = mommom.buy(msg.sender, foodID); // mint token
         food.stocks = food.stocks - 1;
-        NomnomToken memory nomnomToken = NomnomToken({
+        MommomToken memory mommomToken = MommomToken({ 
             tokenID: tokenID,
             redeemed: false
         });
-        nomnomTokens[tokenID] = nomnomToken; // track all tokens
-        customers[msg.sender].ownedNomnom.push(tokenID); // track all customer tokens
-
+        mommomTokens[tokenID] = mommomToken; // track all tokens
+        customers[msg.sender].ownedMommoms.push(tokenID); // track all customer tokens
+        
         emit EventBoughtFood(msg.sender, foodID, block.timestamp, tokenID);
         lastTokenID[msg.sender] = tokenID;
-        getCustomerNomnomsToken();
+        getCustomerMommomsToken();
         return tokenID;
     }
 
     function redeem(uint256 tokenID) public {
-        require(nomnomTokens[tokenID].redeemed == false);
+        require(mommomTokens[tokenID].redeemed == false);
         revokeOwnership(msg.sender, tokenID);
-        nomnom.redeem(msg.sender, tokenID);
-        nomnomTokens[tokenID].redeemed = true;
-        string memory foodID = nomnom.tokenURI(tokenID);
-        getCustomerNomnomsToken();
+        mommom.redeem(msg.sender, tokenID);
+        mommomTokens[tokenID].redeemed = true;
+        string memory foodID = mommom.tokenURI(tokenID);
+        getCustomerMommomsToken();
         emit EventRedeemFood(msg.sender, foodID, block.timestamp, tokenID);
     }
 
     function gift(address receiver, uint256 tokenID) public {
         revokeOwnership(msg.sender, tokenID);
-        nomnom.gift(msg.sender, receiver, tokenID);
-        customers[receiver].ownedNomnoms.push(tokenID);
-        string memory foodID = nomnom.tokenURI(tokenID);
-        getCustomerNomnomsToken();
+        mommom.gift(msg.sender, receiver, tokenID);
+        customers[receiver].ownedMommoms.push(tokenID);
+        string memory foodID = mommom.tokenURI(tokenID);
+        getCustomerMommomsToken();
         emit EventGiftFood(
             msg.sender,
             receiver,
@@ -121,41 +119,38 @@ contract Market {
     function buyAndGift(string memory foodID, address receiver) public payable {
         uint256 tokenID = buy(foodID);
         gift(receiver, tokenID);
-        getCustomerNomnomsToken();
-        lastTokenList[receiver] = customers[receiver].ownedNomnoms;
+        getCustomerMommomsToken();
+        lastTokenList[receiver] = customers[receiver].ownedMommoms;
     }
 
     function revokeOwnership(address owner, uint256 tokenID) private {
-        uint256 oldTokenBalance = nomnom.balanceOf(msg.sender);
+        uint256 oldTokenBalance = mommom.balanceOf(msg.sender);
         Customer storage customer = customers[owner];
-        uint256[] storage ownedNomnoms = customer.ownedNomnoms;
+        uint256[] storage ownedMommoms = customer.ownedMommoms;
         for (uint256 i = 0; i < oldTokenBalance; i++) {
-            if (ownedNomnoms[i] == tokenID) {
-                ownedNomnoms[i] = ownedNomnoms[oldTokenBalance - 1];
-                ownedNomnoms.pop();
+            if (ownedMommoms[i] == tokenID) {
+                ownedMommoms[i] = ownedMommoms[oldTokenBalance - 1];
+                ownedMommoms.pop();
                 break;
             }
         }
     }
 
-    function rewarded(string memory name, string memory symbol)
-        public
-        returns (address)
-    {
+    function rewarded(string memory name, string memory symbol) public returns (address){
         Reward reward = new Reward(name, symbol);
         reward.rewarded(msg.sender);
         return address(reward);
     }
 
-    function getCustomerNomnomsToken() public {
-        lastTokenList[msg.sender] = customers[msg.sender].ownedNomnoms;
+    function getCustomerMommomsToken() public {
+        lastTokenList[msg.sender] = customers[msg.sender].ownedMommoms;
     }
 
-    function getLastTokenList() public view returns (uint256[] memory) {
+    function getLastTokenList() public view returns(uint256[] memory) {
         return lastTokenList[msg.sender];
     }
 
-    function getFoodID(uint256 tokenID) public view returns (string memory) {
-        return nomnom.tokenURI(tokenID);
+    function getFoodID(uint256 tokenID) public view returns(string memory) {
+        return mommom.tokenURI(tokenID);
     }
 }

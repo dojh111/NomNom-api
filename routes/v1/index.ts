@@ -9,7 +9,7 @@ import UserActions from './userActions';
 import SupplierActions from './supplierActions';
 import BlockchainTrackerApi from './blockchainTrackerApi';
 import Food from './food';
-import Restaurant from './restaurant';
+import RestaurantApi from './restaurantApi';
 import FriendsHandlerApi from './friendsHandler.api';
 import ExchangeRateApi from './exchangeRateApi';
 
@@ -20,7 +20,7 @@ const supplierActionsRoute: SupplierActions = new SupplierActions();
 const blockchainTrackerApiRoute: BlockchainTrackerApi =
     new BlockchainTrackerApi();
 const foodRoute: Food = new Food();
-const restaurantRoute: Restaurant = new Restaurant();
+const restaurantApiRoute: RestaurantApi = new RestaurantApi();
 const friendsHandlerApiRoute: FriendsHandlerApi = new FriendsHandlerApi();
 const exchangeRateApiRoute: ExchangeRateApi = new ExchangeRateApi();
 
@@ -30,7 +30,7 @@ userActionsRoute.routes(router);
 supplierActionsRoute.routes(router);
 blockchainTrackerApiRoute.routes(router);
 foodRoute.routes(router);
-restaurantRoute.routes(router);
+restaurantApiRoute.routes(router);
 friendsHandlerApiRoute.routes(router);
 exchangeRateApiRoute.routes(router);
 
