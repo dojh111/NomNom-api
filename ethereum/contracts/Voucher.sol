@@ -5,28 +5,28 @@ import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 
-contract Mommom is ERC721URIStorage, ERC721Enumerable {
+contract Voucher is ERC721URIStorage, ERC721Enumerable {
     using Counters for Counters.Counter;
     Counters.Counter private tokenIDTracker;
 
-    constructor() ERC721('Mommom', 'MOMMOM') {
+    constructor() ERC721('Voucher', 'Voucher') {
     }
 
-    function buy(address owner, string memory foodID) public returns (uint256) {
+    function buy(address owner, string memory voucherName) public returns (uint256) {
         uint256 tokenID = tokenIDTracker.current();
         tokenIDTracker.increment();
         _mint(owner, tokenID);
-        _setTokenURI(tokenID, foodID);
+        _setTokenURI(tokenID, voucherName);
         return tokenID;
     }
 
     function redeem(address owner, uint256 tokenID) public { 
-        require( _isApprovedOrOwner(owner, tokenID), 'Caller is not owner of this Mommom token');
+        require( _isApprovedOrOwner(owner, tokenID), 'Caller is not owner of this voucher');
         _burn(tokenID);
     }
 
     function gift(address owner, address receiver, uint256 tokenID) public { 
-        require( _isApprovedOrOwner(owner, tokenID), 'Caller is not owner of this Mommom token');
+        require( _isApprovedOrOwner(owner, tokenID), 'Caller is not owner of this voucher');
         _transfer(owner, receiver, tokenID);
     }
 

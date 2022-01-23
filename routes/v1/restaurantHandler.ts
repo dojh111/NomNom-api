@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { ethers } from 'ethers';
-import Market from '../../ethereum/Market.sol/Market.json';
+import Market from '../../ethereum/artifacts/contracts/Supplier.sol/Supplier.json';
 import { RestaurantData } from './restaurantApi';
 import DateTimeParser from './dateTimeParser';
 
@@ -25,21 +25,21 @@ export default class RestaurantHandler {
         const rinkebyUrl =
             'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161';
         this.provider = new ethers.providers.JsonRpcProvider(rinkebyUrl);
-        // Create Contract - TO UPDATE TO NEWEST CONTRACT
         const boosterContractAddress =
-            '0xE5B885Cb0d8dBF8B69f33CcB3BC4774a47eCd2e7';
+            '0x6250FB79082e433e40A596d3d4DB4a406391C01b';
         this.boosterContract = new ethers.Contract(
             boosterContractAddress,
             Market.abi,
             this.provider
         );
-        // TO UPDATE TO CORRECT EVENT NAME AND PARAMS
+        // Listen to contract for booster redemption
         this.boosterContract.on(
-            'EventBoughtFood',
-            async (user, foodID, date, tokenId) => {
+            'EventRedeemBooster',
+            async (user, boosterName, date, tokenID) => {
                 // May need to parse to interger
                 console.log('Boost event emitted');
-                await this.applyBooster(user, date, tokenId);
+                const boosterTier = parseInt(boosterName);
+                await this.applyBooster(user, date, boosterTier);
             }
         );
     }
@@ -69,10 +69,6 @@ export default class RestaurantHandler {
             this.dateTimeParser.convertTimeFromUnix(boostStartTime);
 
         const startDateTime = new Date(startDateTimeString);
-        // console.log('START TIME:');
-        // console.log(startDateTimeString);
-        // console.log(startDateTime);
-
         // Boost duration in days
         let boostDuration = 0;
         switch (boostTier) {

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import Market from '../../ethereum/Market.sol/Market.json';
+import Market from '../../ethereum/artifacts/contracts/Market.sol/Market.json';
 import { MongoClient, ObjectId } from 'mongodb';
 import DateTimeParser from './dateTimeParser';
 
@@ -22,7 +22,7 @@ export default class BlockchainTracker {
         this.provider = new ethers.providers.JsonRpcProvider(rinkebyUrl);
         // Create Contract
         const marketContractAddress =
-            '0xE5B885Cb0d8dBF8B69f33CcB3BC4774a47eCd2e7';
+            '0x7d268598d5E98b5848A6F578d8DB164D1F0AfB1c';
         this.marketContract = new ethers.Contract(
             marketContractAddress,
             Market.abi,
