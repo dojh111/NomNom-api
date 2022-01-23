@@ -37,7 +37,7 @@ export default class Food {
     public routes(router: express.Router): void {
         // POST create
         router.post(
-            'supplier/food',
+            '/supplier/food',
             multer().none(),
             async (req: Request, res: Response) => {
                 try {
@@ -49,7 +49,6 @@ export default class Food {
                         foodImageUrl: req.body.foodImageUrl,
                         restaurantName: req.body.restaurantName,
                     };
-                    console.log('here');
                     this.collection.insertOne(foodData);
                     res.send({
                         isOk: true,
