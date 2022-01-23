@@ -24,6 +24,7 @@ contract Supplier {
 
     struct Food {
         string name;
+        string restaurant;
         uint256 price;
     }
 
@@ -64,7 +65,8 @@ contract Supplier {
     function listFood(string memory _name, string memory _restaurant, uint256 _price) public {
         Food memory food = Food({
             name: _name,
-            price: _price
+            price: _price,
+            restaurant: _restaurant
         });
         foodMeta[_name] = food;
         foods[_restaurant].push(food);
@@ -72,6 +74,10 @@ contract Supplier {
 
     function getFoodPrice(string memory name) public view returns (uint256) {
         return foodMeta[name].price;
+    }
+
+    function getFoodRestaurant(string memory name) public view returns (string memory) {
+        return foodMeta[name].restaurant;
     }
 
     function getVoucherValue(string memory name) public view returns (uint256) {

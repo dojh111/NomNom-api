@@ -12,6 +12,7 @@ contract Market {
     event EventBoughtFood(
         address indexed user,
         string foodName,
+        string restaurantName,
         uint256 date,
         uint256 tokenID
     );
@@ -83,6 +84,7 @@ contract Market {
 
     function buyFood(string memory foodName) public payable returns (uint256){
         uint256 price = supplier.getFoodPrice(foodName);
+        string memory restaurant = supplier.getFoodRestaurant(foodName);
         require(msg.value >= price, "Insufficient money");
         uint256 tokenID = food.buy(msg.sender, foodName); // mint token
         Token memory foodToken = Token({
@@ -92,7 +94,7 @@ contract Market {
         foodTokens[tokenID] = foodToken; // track all tokens
         customers[msg.sender].ownedFoods.push(foodToken); // track all customer tokens
         lastTokenID = tokenID;
-        emit EventBoughtFood(msg.sender, foodName, block.timestamp, tokenID);
+        emit EventBoughtFood(msg.sender, foodName, restaurant, block.timestamp, tokenID);
         return tokenID;
     }
 
@@ -131,6 +133,7 @@ contract Market {
 
     function buyFoodPromo(string memory foodName, uint256 voucherID) public payable returns(uint256){
         uint256 originalPrice = supplier.getFoodPrice(foodName);
+        string memory restaurant = supplier.getFoodRestaurant(foodName);
         string memory voucherName = voucher.tokenURI(voucherID);
         uint256 discountedPrice = originalPrice - supplier.getVoucherValue(voucherName);
         require(msg.value >= discountedPrice, "Insufficient money");
@@ -141,7 +144,7 @@ contract Market {
         });
         customers[msg.sender].ownedFoods.push(foodToken); // track all customer tokens
         lastTokenID = tokenID;
-        emit EventBoughtFood(msg.sender, foodName, block.timestamp, tokenID);
+        emit EventBoughtFood(msg.sender, foodName, restaurant, block.timestamp, tokenID);
         return tokenID;
     }
 
@@ -161,7 +164,7 @@ contract Market {
         voucherTokens[tokenID] = voucherToken; // track all tokens
         customers[msg.sender].ownedVouchers.push(voucherToken); // track all customer tokens
         lastTokenID = tokenID;
-        emit EventBoughtFood(msg.sender, voucherName, block.timestamp, tokenID);
+        emit EventBoughtVoucher(msg.sender, voucherName, block.timestamp, tokenID);
         return tokenID;
     }
 
@@ -169,7 +172,7 @@ contract Market {
         revokeVoucherOwnership(msg.sender, tokenID);
         voucher.redeem(msg.sender, tokenID);
         Token storage voucherToken = voucherTokens[tokenID];
-        emit EventRedeemFood(msg.sender, voucherToken.name, block.timestamp, tokenID);
+        emit EventRedeemVoucher(msg.sender, voucherToken.name, block.timestamp, tokenID);
     }
 
     function giftVoucher(address receiver, uint256 tokenID) public {
@@ -177,7 +180,7 @@ contract Market {
         voucher.gift(msg.sender, receiver, tokenID);
         Token storage voucherToken = voucherTokens[tokenID];
         customers[receiver].ownedFoods.push(voucherToken);
-        emit EventGiftFood( msg.sender, receiver, voucherToken.name, block.timestamp, tokenID);
+        emit EventGiftVoucher( msg.sender, receiver, voucherToken.name, block.timestamp, tokenID);
     }
 
     function buyAndGiftVoucher(string memory voucherName, address receiver) public payable {

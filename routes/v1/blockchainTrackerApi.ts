@@ -51,6 +51,55 @@ export default class BlockchainTrackerApi extends BlockchainTracker {
         );
 
         router.get(
+            '/loyalty/:walletAddress/:restaurantName',
+            async (req: Request, res: Response) => {
+                try {
+                    const walletAddress = req.params.walletAddress;
+                    const restaurantName = req.params.restaurantName;
+                    const dataFilter =
+                        this.marketContract.filters.EventBoughtFood(
+                            walletAddress
+                        );
+                    const startBlock = 0;
+                    const endBlock = await this.provider.getBlockNumber();
+                    const logs = await this.marketContract.queryFilter(
+                        dataFilter,
+                        startBlock,
+                        endBlock
+                    );
+                    const logArray = [...logs];
+                    let count = 0;
+                    let tier = 'bronze';
+
+                    for (let log of logArray) {
+                        if (log.hasOwnProperty('args') && log.args) {
+                            if (log.args.restaurantName == restaurantName) {
+                                count++;
+                            }
+                        }
+                    }
+
+                    if (count >= 10 && count < 20) {
+                        tier = 'silver';
+                    } else if (count >= 20) {
+                        tier = 'gold';
+                    }
+
+                    res.send({
+                        tier: tier,
+                        message: 'Success',
+                    }).status(200);
+                } catch (err: any) {
+                    console.log(err.message);
+                    res.send({
+                        tier: 'bronze',
+                        message: err.message,
+                    }).status(500);
+                }
+            }
+        );
+
+        router.get(
             '/receivedgifts/:walletAddress',
             async (req: Request, res: Response) => {
                 try {

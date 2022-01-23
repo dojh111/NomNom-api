@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { ethers } from 'ethers';
-import Market from '../../ethereum/artifacts/contracts/Supplier.sol/Supplier.json';
+import Supplier from '../../ethereum/artifacts/contracts/Supplier.sol/Supplier.json';
 import { RestaurantData } from './restaurantApi';
 import DateTimeParser from './dateTimeParser';
 
@@ -26,10 +26,10 @@ export default class RestaurantHandler {
             'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161';
         this.provider = new ethers.providers.JsonRpcProvider(rinkebyUrl);
         const boosterContractAddress =
-            '0xe5D08F89f7103520064D4356A6D344B8210acC73';
+            '0x34Bd61E4cBE9519651053a8Ee3D18b4eF5a53bb6 ';
         this.boosterContract = new ethers.Contract(
             boosterContractAddress,
-            Market.abi,
+            Supplier.abi,
             this.provider
         );
         // Listen to contract for booster redemption
