@@ -49,7 +49,7 @@ export default class Food {
                         foodImageUrl: req.body.foodImageUrl,
                         restaurantName: req.body.restaurantName,
                     };
-                    this.collection.insertOne(foodData);
+                    await this.collection.insertOne(foodData);
                     res.send({
                         isOk: true,
                         message: 'Food listed',
