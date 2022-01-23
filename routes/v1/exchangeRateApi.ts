@@ -33,25 +33,5 @@ export default class ExchangeRateApi extends ExchangeRateHandler {
                 }
             }
         );
-
-        router.get(
-            '/convert/test',
-            multer().none(),
-            async (req: Request, res: Response) => {
-                try {
-                    const amount = req.body.amount;
-                    const convertedPrice = await this.convertSGDToWEI(amount);
-                    res.send({
-                        isOk: true,
-                        message: 'Currency successfully converted',
-                        convertedPrice: convertedPrice,
-                    }).status(200);
-                } catch (err: any) {
-                    res.send({
-                        message: err.message,
-                    }).status(403);
-                }
-            }
-        );
     }
 }
