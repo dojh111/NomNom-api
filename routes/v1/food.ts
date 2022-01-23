@@ -50,8 +50,14 @@ export default class Food {
                         restaurantName: req.body.restaurantName,
                     };
                     await this.collection.insertOne(foodData);
+                    const returnData = await this.searchDatabase({
+                        foodName: req.body.foodName,
+                        restaurantName: req.body.restaurantName,
+                        foodPrice: req.body.foodPrice,
+                    });
                     res.send({
                         isOk: true,
+                        foodData: returnData,
                         message: 'Food listed',
                     }).status(200);
                     return;
