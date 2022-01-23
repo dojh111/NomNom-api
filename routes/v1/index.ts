@@ -12,6 +12,7 @@ import Food from './food';
 import RestaurantApi from './restaurantApi';
 import FriendsHandlerApi from './friendsHandler.api';
 import ExchangeRateApi from './exchangeRateApi';
+import Voucher from './voucher';
 
 // Creating new Routes Instances.
 const healthRoute: HealthChecker = new HealthChecker();
@@ -23,6 +24,7 @@ const foodRoute: Food = new Food();
 const restaurantApiRoute: RestaurantApi = new RestaurantApi();
 const friendsHandlerApiRoute: FriendsHandlerApi = new FriendsHandlerApi();
 const exchangeRateApiRoute: ExchangeRateApi = new ExchangeRateApi();
+const voucherRoute: Voucher = new Voucher();
 
 // Registering our Routes.
 healthRoute.routes(router);
@@ -33,5 +35,6 @@ foodRoute.routes(router);
 restaurantApiRoute.routes(router);
 friendsHandlerApiRoute.routes(router);
 exchangeRateApiRoute.routes(router);
+voucherRoute.routes(router);
 
 export default router;

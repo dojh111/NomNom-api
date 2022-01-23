@@ -19,7 +19,7 @@ type VoucherData = {
     expiryDate: string;
 };
 
-export default class Food {
+export default class Voucher {
     collection: any;
 
     constructor() {
