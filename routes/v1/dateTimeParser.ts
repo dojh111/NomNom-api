@@ -33,6 +33,17 @@ export default class DateTimeParser {
         return timeString;
     }
 
+    public getCurrentDateTime(): string {
+        let dateTime: string;
+        const current = new Date();
+
+        const date = this.createDateString(current);
+        const time = this.createTimeString(current);
+        dateTime = date + 'T' + time;
+
+        return dateTime;
+    }
+
     public convertTimeFromUnix(UNIXTimestamp: any): string {
         let dateTime: string;
         const dateObject = new Date(UNIXTimestamp * 1000);

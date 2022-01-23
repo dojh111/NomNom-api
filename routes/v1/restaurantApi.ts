@@ -4,18 +4,6 @@ import multer from 'multer';
 import RestaurantHandler from './restaurantHandler';
 // import ObjectId from 'mongodb';
 
-// 3 boost tiers
-/**
- * {
- *   '1': [] Bronze
- *   '3': [] Gold tier
- *   '0': No tier
- * }
- *
- *
- *
- */
-
 export type RestaurantData = {
     restaurantName: string;
     restaurantDescription: string;
@@ -86,16 +74,18 @@ export default class RestaurantApi extends RestaurantHandler {
             }
         );
 
+        // Test route - to be removed
         router.get(
-            '/testDate',
+            '/testRoute',
             multer().none(),
             async (req: Request, res: Response) => {
                 try {
-                    const result = await this.applyBooster(
-                        'testAddress',
-                        '1641814271',
-                        2
-                    );
+                    // const result = await this.applyBooster(
+                    //     'testAddress',
+                    //     '1641814271',
+                    //     2
+                    // );
+                    const result = await this.sortAndUpdateRestaurants();
                     res.send(result);
                 } catch (err: any) {
                     res.send({

@@ -51,6 +51,7 @@ export default class RestaurantHandler {
         return array;
     }
 
+    // Returns entire database of restaurants
     async getDatabase() {
         const searchResult = await this.collection.find();
         const array = await searchResult.toArray();
@@ -113,5 +114,76 @@ export default class RestaurantHandler {
         // } else if (startDateTime > parsedStringified) {
         //     console.log('STARTDATE > END DATE');
         // }
+    }
+
+    checkIsBoosterValid(restaurantData: RestaurantData, currentDate: Date) {
+        const expiryDate = new Date(
+            JSON.parse(restaurantData.restaurantBooster.boostExpiry)
+        );
+        return expiryDate > currentDate ? true : false;
+    }
+
+    async removeBoosterEffect(restaurantData: RestaurantData) {
+        let boosterData = restaurantData.restaurantBooster;
+        boosterData.isBoosted = false;
+        boosterData.boostTier = 0;
+        boosterData.boostExpiry = '';
+
+        await this.collection.updateOne(
+            {
+                restaurantName: restaurantData.restaurantName,
+                restaurantWalletAddress: restaurantData.restaurantWalletAddress,
+            },
+            {
+                $set: { restaurantBooster: boosterData },
+            }
+        );
+    }
+
+    // Sort restaurants according to tiers and update boost effects
+    async sortAndUpdateRestaurants() {
+        let returnData: any = {
+            data: [],
+            tier3: [],
+            tier2: [],
+            tier1: [],
+            tier0: [],
+        };
+        const restaurants: RestaurantData[] = await this.getDatabase();
+        returnData.data = restaurants;
+
+        const currentDateString = this.dateTimeParser.getCurrentDateTime();
+        const currentDate = new Date(currentDateString);
+        for (let restaurant of restaurants) {
+            // If booster exists and is boosted
+            if (
+                restaurant.hasOwnProperty('restaurantBooster') &&
+                restaurant.restaurantBooster.isBoosted
+            ) {
+                // Check if booster is still valid
+                const isValid = this.checkIsBoosterValid(
+                    restaurant,
+                    currentDate
+                );
+                if (isValid) {
+                    const tier: string =
+                        'tier' +
+                        restaurant.restaurantBooster.boostTier.toString();
+                    returnData[tier].push(restaurant);
+                    continue; // Skip to next restaurant
+                } else if (!isValid) {
+                    // Update restaurant booster
+                    await this.removeBoosterEffect(restaurant);
+                }
+            }
+            // Else just push into tier 0
+            returnData.tier0.push(restaurant);
+        }
+        console.log(`Total data length: ${restaurants.length}`);
+        console.log(`Number of tier 3: ${returnData.tier3.length}`);
+        console.log(`Number of tier 2: ${returnData.tier2.length}`);
+        console.log(`Number of tier 1: ${returnData.tier1.length}`);
+        console.log(`Number of tier 0: ${returnData.tier0.length}`);
+        return returnData;
     }
 }
