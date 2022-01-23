@@ -40,7 +40,7 @@ export default class ExchangeRateApi extends ExchangeRateHandler {
             async (req: Request, res: Response) => {
                 try {
                     const amount = req.body.amount;
-                    const convertedPrice = await this.convertETHToSGD(amount);
+                    const convertedPrice = await this.convertSGDToWEI(amount);
                     res.send({
                         isOk: true,
                         message: 'Currency successfully converted',
