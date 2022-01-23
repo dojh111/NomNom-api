@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ethers } from 'ethers';
+import Web3 from 'web3';
 
 export default class ExchangeRateHandler {
     // URL of coinbase API to get current prices of 1 ETH
@@ -29,7 +29,7 @@ export default class ExchangeRateHandler {
             this.currentPriceList = responseData.data.rates;
             // Update query time
             this.lastQueryTime = Date.now();
-            console.log(this.currentPriceList);
+            // console.log(this.currentPriceList);
             console.log('Pricelist updated');
         } catch (err: any) {
             console.log(
@@ -64,13 +64,19 @@ export default class ExchangeRateHandler {
         return targetCurrencyPrice * parseFloat(ethereumAmount);
     }
 
-    async convertETHToSGD(amount: string) {
+    async convertSGDToWEI(amount: string) {
         await this.checkPriceValidity();
         // Target amount will be SGD
-        const targetCurrencyPrice = parseFloat(this.currentPriceList.SGD);
-        const SGD1toETH = 1 / targetCurrencyPrice;
-        const etherString = (parseFloat(amount) * SGD1toETH).toString();
-        const ethValue = ethers.utils.parseEther(etherString);
-        return ethValue;
+        const targetCurrencyPrice = Number.parseFloat(
+            this.currentPriceList.SGD
+        );
+        const SGD1toETH = (1 / targetCurrencyPrice).toPrecision(6);
+        const etherString = (
+            parseFloat(amount) * parseFloat(SGD1toETH)
+        ).toPrecision(6);
+        console.log(etherString);
+        const weiValue = Web3.utils.toWei(etherString, 'ether');
+        console.log(weiValue);
+        return weiValue;
     }
 }

@@ -59,7 +59,7 @@ export default class Food {
                         foodPrice: req.body.foodPrice,
                     });
                     returnData[0].foodPrice =
-                        await this.exchangeRateHandler.convertETHToSGD(
+                        await this.exchangeRateHandler.convertSGDToWEI(
                             returnData[0].foodPrice
                         );
                     res.send({

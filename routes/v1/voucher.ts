@@ -89,7 +89,7 @@ export default class Voucher {
                         expiryDate: req.body.expiryDate,
                     });
                     returnData[0].value =
-                        await this.exchangeRateHandler.convertETHToSGD(
+                        await this.exchangeRateHandler.convertSGDToWEI(
                             returnData[0].value
                         );
                     res.send({
