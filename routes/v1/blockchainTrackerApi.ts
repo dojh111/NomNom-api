@@ -69,7 +69,7 @@ export default class BlockchainTrackerApi extends BlockchainTracker {
                     );
                     const logArray = [...logs];
                     let count = 0;
-                    let tier = 'bronze';
+                    let tier = 'BRONZE';
 
                     for (let log of logArray) {
                         if (log.hasOwnProperty('args') && log.args) {
@@ -80,9 +80,9 @@ export default class BlockchainTrackerApi extends BlockchainTracker {
                     }
 
                     if (count >= 10 && count < 20) {
-                        tier = 'silver';
+                        tier = 'SILVER';
                     } else if (count >= 20) {
-                        tier = 'gold';
+                        tier = 'GOLD';
                     }
 
                     res.send({
@@ -92,7 +92,7 @@ export default class BlockchainTrackerApi extends BlockchainTracker {
                 } catch (err: any) {
                     console.log(err.message);
                     res.send({
-                        tier: 'bronze',
+                        tier: 'BRONZE',
                         message: err.message,
                     }).status(500);
                 }
