@@ -26,7 +26,7 @@ export default class RestaurantHandler {
             'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161';
         this.provider = new ethers.providers.JsonRpcProvider(rinkebyUrl);
         const boosterContractAddress =
-            '0x34Bd61E4cBE9519651053a8Ee3D18b4eF5a53bb6 ';
+            '0x0270a409FfCe068c3bD844d331F44c88Ad3e8e89 ';
         this.boosterContract = new ethers.Contract(
             boosterContractAddress,
             Supplier.abi,

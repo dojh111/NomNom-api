@@ -22,7 +22,7 @@ export default class BlockchainTracker {
         this.provider = new ethers.providers.JsonRpcProvider(rinkebyUrl);
         // Create Contract
         const marketContractAddress =
-            '0xFB630F97282f9582f36628C14a35B7e10B0B53aB';
+            '0x72FEB780F9e0E52461CD49a7D44138DCb737A0b7';
         this.marketContract = new ethers.Contract(
             marketContractAddress,
             Market.abi,
