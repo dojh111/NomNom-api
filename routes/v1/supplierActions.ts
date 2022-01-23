@@ -2,6 +2,7 @@ import * as express from 'express';
 import { Request, Response } from 'express';
 import { MongoClient } from 'mongodb';
 import multer from 'multer';
+import RestaurantHandler from './restaurantHandler';
 
 const uri =
     'mongodb+srv://MinistryOfMetaMask:eF28WeXha7n3Y8DV@cluster0.6i8am.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
@@ -21,11 +22,13 @@ export type SupplierData = {
 
 export default class SupplierActions {
     collection: any;
+    restaurantHandler: RestaurantHandler;
 
     constructor() {
         client.connect((err) => {
             this.collection = client.db('NomNom').collection('Suppliers');
         });
+        this.restaurantHandler = new RestaurantHandler();
     }
 
     async searchDatabase(searchItem: any) {
@@ -127,6 +130,10 @@ export default class SupplierActions {
                     if (
                         supplierPassword === supplierDetails[0].supplierPassword
                     ) {
+                        const restaurantData =
+                            this.restaurantHandler.getRestaurantDetails(
+                                supplierName
+                            );
                         res.send({
                             loginOk: true,
                             supplierProfile: supplierDetails[0],

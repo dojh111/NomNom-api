@@ -44,6 +44,8 @@ export default class RestaurantHandler {
         );
     }
 
+    async getRestaurantDetails(restaurantName: string) {}
+
     async searchDatabase(searchItem: any) {
         const searchResult = await this.collection.find(searchItem);
         const array = await searchResult.toArray();
@@ -144,10 +146,10 @@ export default class RestaurantHandler {
     async sortAndUpdateRestaurants() {
         let returnData: any = {
             data: [],
-            tier3: [],
-            tier2: [],
-            tier1: [],
-            tier0: [],
+            3: [],
+            2: [],
+            1: [],
+            0: [],
         };
         const restaurants: RestaurantData[] = await this.getDatabase();
         returnData.data = restaurants;
@@ -166,10 +168,9 @@ export default class RestaurantHandler {
                     currentDate
                 );
                 if (isValid) {
-                    const tier: string =
-                        'tier' +
-                        restaurant.restaurantBooster.boostTier.toString();
-                    returnData[tier].push(restaurant);
+                    returnData[
+                        restaurant.restaurantBooster.boostTier.toString()
+                    ].push(restaurant);
                     continue; // Skip to next restaurant
                 } else if (!isValid) {
                     // Update restaurant booster
@@ -177,13 +178,13 @@ export default class RestaurantHandler {
                 }
             }
             // Else just push into tier 0
-            returnData.tier0.push(restaurant);
+            returnData[0].push(restaurant);
         }
         console.log(`Total data length: ${restaurants.length}`);
-        console.log(`Number of tier 3: ${returnData.tier3.length}`);
-        console.log(`Number of tier 2: ${returnData.tier2.length}`);
-        console.log(`Number of tier 1: ${returnData.tier1.length}`);
-        console.log(`Number of tier 0: ${returnData.tier0.length}`);
+        console.log(`Number of tier 3: ${returnData[3].length}`);
+        console.log(`Number of tier 2: ${returnData[2].length}`);
+        console.log(`Number of tier 1: ${returnData[1].length}`);
+        console.log(`Number of tier 0: ${returnData[0].length}`);
         return returnData;
     }
 }

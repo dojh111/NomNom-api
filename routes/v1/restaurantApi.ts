@@ -63,9 +63,9 @@ export default class RestaurantApi extends RestaurantHandler {
             async (req: Request, res: Response) => {
                 try {
                     // Retrieve details from database
-                    const restaurantDetails = await this.getDatabase();
-                    // const restaurantDetails =
-                    //     await this.sortAndUpdateRestaurants();
+                    // const restaurantDetails = await this.getDatabase();
+                    const restaurantDetails =
+                        await this.sortAndUpdateRestaurants();
                     console.log(restaurantDetails);
                     res.send(restaurantDetails);
                 } catch (err: any) {
