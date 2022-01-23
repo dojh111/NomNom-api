@@ -44,9 +44,7 @@ export default class RestaurantHandler {
         );
     }
 
-    async getRestaurantDetails(restaurantName: string) {}
-
-    async searchDatabase(searchItem: any) {
+    public async searchDatabase(searchItem: any) {
         const searchResult = await this.collection.find(searchItem);
         const array = await searchResult.toArray();
         console.log(array);

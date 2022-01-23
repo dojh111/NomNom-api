@@ -114,7 +114,7 @@ export default class SupplierActions {
                     // Retrieve details from database
                     let supplierDetails: SupplierData[] =
                         await this.searchDatabase({
-                            userName: supplierName,
+                            supplierName: supplierName,
                         });
                     // Check if user exists, if not use email
                     if (supplierDetails.length === 0) {
@@ -131,14 +131,15 @@ export default class SupplierActions {
                         supplierPassword === supplierDetails[0].supplierPassword
                     ) {
                         const restaurantData =
-                            this.restaurantHandler.getRestaurantDetails(
-                                supplierName
-                            );
-                        res.send({
+                            await this.restaurantHandler.searchDatabase({
+                                restaurantName: supplierName,
+                            });
+                        res.status(200).send({
                             loginOk: true,
                             supplierProfile: supplierDetails[0],
+                            restaurantProfile: restaurantData[0],
                             message: 'Login success',
-                        }).status(200);
+                        });
                     }
                     throw new Error('Login failed - Invalid Password');
                 } catch (err: any) {
