@@ -75,26 +75,5 @@ export default class RestaurantApi extends RestaurantHandler {
                 }
             }
         );
-
-        // Test route - to be removed
-        router.get(
-            '/testRoute',
-            multer().none(),
-            async (req: Request, res: Response) => {
-                try {
-                    // const result = await this.applyBooster(
-                    //     'testAddress',
-                    //     '1641814271',
-                    //     2
-                    // );
-                    const result = await this.sortAndUpdateRestaurants();
-                    res.send(result);
-                } catch (err: any) {
-                    res.send({
-                        message: err.message,
-                    }).status(403);
-                }
-            }
-        );
     }
 }

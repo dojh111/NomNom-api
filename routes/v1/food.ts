@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { Request, Response } from 'express';
 import { MongoClient, ObjectId } from 'mongodb';
+import ExchangeRateHandler from './exchangeRateHandler';
 import multer from 'multer';
 // import ObjectId from 'mongodb';
 
@@ -13,11 +14,13 @@ const client = new MongoClient(uri, {
 
 export default class Food {
     collection: any;
+    exchangeRateHandler: ExchangeRateHandler;
 
     constructor() {
         client.connect((err) => {
             this.collection = client.db('NomNom').collection('Food');
         });
+        this.exchangeRateHandler = new ExchangeRateHandler();
     }
 
     async searchDatabase(searchItem: any) {
@@ -50,14 +53,18 @@ export default class Food {
                         restaurantName: req.body.restaurantName,
                     };
                     await this.collection.insertOne(foodData);
-                    const returnData = await this.searchDatabase({
+                    let returnData = await this.searchDatabase({
                         foodName: req.body.foodName,
                         restaurantName: req.body.restaurantName,
                         foodPrice: req.body.foodPrice,
                     });
+                    returnData[0].foodPrice =
+                        await this.exchangeRateHandler.convertETHToSGD(
+                            returnData[0].foodPrice
+                        );
                     res.send({
                         isOk: true,
-                        foodData: returnData,
+                        foodData: returnData[0],
                         message: 'Food listed',
                     }).status(200);
                     return;

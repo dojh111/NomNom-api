@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { Request, Response } from 'express';
 import { MongoClient, ObjectId } from 'mongodb';
+import ExchangeRateHandler from './exchangeRateHandler';
 import multer from 'multer';
 // import ObjectId from 'mongodb';
 
@@ -21,11 +22,13 @@ type VoucherData = {
 
 export default class Voucher {
     collection: any;
+    exchangeRateHandler: ExchangeRateHandler;
 
     constructor() {
         client.connect((err) => {
             this.collection = client.db('NomNom').collection('Voucher');
         });
+        this.exchangeRateHandler = new ExchangeRateHandler();
     }
 
     async searchDatabase(searchItem: any) {
@@ -79,8 +82,19 @@ export default class Voucher {
                         expiryDate: req.body.expiryDate,
                     };
                     await this.collection.insertOne(voucherData);
+                    const returnData = await this.searchDatabase({
+                        supplierName: req.body.supplierName,
+                        walletAddress: req.body.walletAddress,
+                        value: req.body.value,
+                        expiryDate: req.body.expiryDate,
+                    });
+                    returnData[0].value =
+                        await this.exchangeRateHandler.convertETHToSGD(
+                            returnData[0].value
+                        );
                     res.send({
                         isOk: true,
+                        voucherData: returnData[0],
                         message: 'Voucher listed',
                     }).status(200);
                     return;
