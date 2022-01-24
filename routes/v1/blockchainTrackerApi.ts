@@ -48,6 +48,88 @@ export default class BlockchainTrackerApi extends BlockchainTracker {
         );
 
         router.get(
+            '/nomnombalance/:walletAddress',
+            async (req: Request, res: Response) => {
+                try {
+                    let totalCount = 0;
+                    // Total Bought
+                    const startBlock = 0;
+                    const endBlock = await this.provider.getBlockNumber();
+                    const userAddress = req.params.walletAddress;
+                    // Create filter for event
+                    const dataFilterBuy =
+                        this.marketContract.filters.EventBoughtFood(
+                            userAddress
+                        );
+                    const buyLogs = await this.marketContract.queryFilter(
+                        dataFilterBuy,
+                        startBlock,
+                        endBlock
+                    );
+                    const buyLogArray = [...buyLogs];
+                    const buyCount = buyLogArray.length;
+                    console.log(`BOUGHT: ${buyCount}`);
+
+                    // Total gifts received
+                    const dataFilterGift =
+                        this.marketContract.filters.EventGiftFood(
+                            null,
+                            userAddress
+                        );
+                    const giftLogs = await this.marketContract.queryFilter(
+                        dataFilterGift,
+                        startBlock,
+                        endBlock
+                    );
+                    const giftLogArray = [...giftLogs];
+                    const receivedCount = giftLogArray.length;
+                    console.log(`RECEIVED: ${receivedCount}`);
+
+                    // Total sent gifts
+                    const dataFilterSentGifts =
+                        this.marketContract.filters.EventGiftFood(userAddress);
+                    const sentLogs = await this.marketContract.queryFilter(
+                        dataFilterSentGifts,
+                        startBlock,
+                        endBlock
+                    );
+                    const sentLogArray = [...sentLogs];
+                    const sentCount = sentLogArray.length;
+                    console.log(`GIFTED: ${sentCount}`);
+
+                    // Total redeemed foods
+                    const dataFilterRedeem =
+                        this.marketContract.filters.EventRedeemFood(
+                            userAddress
+                        );
+                    const redeemLogs = await this.marketContract.queryFilter(
+                        dataFilterRedeem,
+                        startBlock,
+                        endBlock
+                    );
+                    const redeemLogArray = [...redeemLogs];
+                    const redeemedCount = redeemLogArray.length;
+                    console.log(`REDEEMED: ${redeemedCount}`);
+
+                    totalCount =
+                        buyCount + receivedCount - sentCount - redeemedCount;
+                    console.log(`FINAL BALANCE: ${totalCount}`);
+
+                    res.send({
+                        count: totalCount,
+                        message: 'Success',
+                    }).status(200);
+                } catch (err: any) {
+                    console.log(err.message);
+                    res.send({
+                        count: 0,
+                        message: err.message,
+                    }).status(500);
+                }
+            }
+        );
+
+        router.get(
             '/loyalty/:walletAddress/:restaurantName',
             async (req: Request, res: Response) => {
                 try {
