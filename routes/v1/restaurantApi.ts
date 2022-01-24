@@ -42,8 +42,14 @@ export default class RestaurantApi extends RestaurantHandler {
                         },
                     };
                     this.collection.insertOne(restaurantData);
+                    let returnData = await this.searchDatabase({
+                        restaurantName: req.body.restaurantName,
+                        restaurantDescription: req.body.restaurantDescription,
+                        restaurantImageUrl: req.body.restaurantImageUrl,
+                    });
                     res.send({
                         isOk: true,
+                        restaurantData: returnData,
                         message: 'Restaurant listed',
                     }).status(200);
                     return;
