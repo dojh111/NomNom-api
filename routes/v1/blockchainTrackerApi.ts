@@ -28,15 +28,12 @@ export default class BlockchainTrackerApi extends BlockchainTracker {
                     );
                     const logArray = [...logs];
                     const buyCount = logArray.length;
-                    const data = await this.formatAndAddNames(
-                        logArray,
-                        userAddress
-                    );
-                    // console.log('DATA HERE');
-                    // console.log(data);
+                    // const data = await this.formatAndAddNames(
+                    //     logArray,
+                    //     userAddress
+                    // );
                     res.send({
                         count: buyCount,
-                        data: data,
                         message: 'Success',
                     }).status(200);
                 } catch (err: any) {
@@ -192,14 +189,14 @@ export default class BlockchainTrackerApi extends BlockchainTracker {
                     const logArray = [...logs];
                     const receivedCount = logArray.length;
 
-                    const data = await this.formatAndAddNames(
-                        logArray,
-                        userAddress
-                    );
+                    // const data = await this.formatAndAddNames(
+                    //     logArray,
+                    //     userAddress
+                    // );
                     console.log(`Total redeem count: ${receivedCount}`);
                     res.send({
                         count: receivedCount,
-                        data: data,
+                        // data: data,
                         message: 'Success',
                     }).status(200);
                 } catch (err: any) {
