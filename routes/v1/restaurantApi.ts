@@ -41,11 +41,21 @@ export default class RestaurantApi extends RestaurantHandler {
                             boostExpiry: '',
                         },
                     };
-                    this.collection.insertOne(restaurantData);
+                    await this.collection.insertOne(restaurantData);
+                    console.log('HERE');
+
+                    // Temporarily apply booster
+                    // await this.applyBooster(
+                    //     req.body.restaurantWalletAddress,
+                    //     1643007493,
+                    //     3
+                    // );
+
+                    console.log('APPLY OVER');
+
                     let returnData = await this.searchDatabase({
                         restaurantName: req.body.restaurantName,
                         restaurantDescription: req.body.restaurantDescription,
-                        restaurantImageUrl: req.body.restaurantImageUrl,
                     });
                     res.send({
                         isOk: true,

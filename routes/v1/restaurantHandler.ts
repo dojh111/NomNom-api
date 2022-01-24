@@ -58,14 +58,16 @@ export default class RestaurantHandler {
         return array;
     }
 
-    async applyBooster(
+    public async applyBooster(
         restaurantWalletAddress: string,
         boostStartTime: any,
         boostTier: number
     ) {
+        console.log('APPLY BOOSTER');
         const restaurantData: RestaurantData[] = await this.searchDatabase({
             restaurantWalletAddress: restaurantWalletAddress,
         });
+        console.log(restaurantData);
         const startDateTimeString =
             this.dateTimeParser.convertTimeFromUnix(boostStartTime);
 
@@ -102,18 +104,6 @@ export default class RestaurantHandler {
                 $set: { restaurantBooster: restaurantBoostData },
             }
         );
-
-        // console.log('END DATE:');
-        // console.log(boostEndDate);
-        // const stringified = JSON.stringify(boostEndDate);
-        // console.log(stringified);
-        // const parsedStringified = new Date(JSON.parse(stringified));
-
-        // if (startDateTime <= parsedStringified) {
-        //     console.log('STARTDATE <= END DATE');
-        // } else if (startDateTime > parsedStringified) {
-        //     console.log('STARTDATE > END DATE');
-        // }
     }
 
     checkIsBoosterValid(restaurantData: RestaurantData, currentDate: Date) {

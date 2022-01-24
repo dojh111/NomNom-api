@@ -40,13 +40,6 @@ export default class UserActions {
         return array;
     }
 
-    public async generateId() {
-        const searchResult = await this.collection.find();
-        const array = await searchResult.toArray();
-        console.log(`Current length: ${array.length}`);
-        return array.length;
-    }
-
     async checkForDuplicateAttribute(userData: UserData) {
         const usernameArray = await this.searchDatabase({
             userName: userData.userName,
@@ -79,7 +72,6 @@ export default class UserActions {
                 try {
                     // Set data into database
                     const userData: UserData = {
-                        _id: await this.generateId(),
                         userName: req.body.userName,
                         userPassword: req.body.userPassword,
                         userEmail: req.body.userEmail,
@@ -95,9 +87,15 @@ export default class UserActions {
                     await this.checkForDuplicateAttribute(userData);
                     // No repeats, proceed to insert
                     await this.collection.insertOne(userData);
+                    let returnData = await this.searchDatabase({
+                        userName: req.body.userName,
+                        userPassword: req.body.userPassword,
+                        userEmail: req.body.userEmail,
+                        userWalletAddress: req.body.userWalletAddress,
+                    });
                     res.send({
                         isOk: true,
-                        userProfile: userData,
+                        userProfile: returnData,
                         message: 'Sign up successful',
                     }).status(200);
                     return;
