@@ -102,7 +102,7 @@ contract Supplier {
     //     rewards[_restaurant].push(reward);
     // }
 
-    function buyBooster(string memory tier) public payable {
+    function buyBooster(string memory tier) public payable returns (uint256) {
         require(msg.value >= 1, "Insufficient money");
         uint256 tokenID = booster.buy(msg.sender, tier); // mint token
         BoosterToken memory boosterToken = BoosterToken({
@@ -114,6 +114,7 @@ contract Supplier {
         // lastTokenID = tokenID;
         // return tokenID;
         emit EventBoughtBooster(msg.sender, tier, block.timestamp, tokenID);
+        return tokenID;
     }
 
     function redeemBooster(uint256 boosterID) public {
@@ -127,6 +128,11 @@ contract Supplier {
                 break;
             }
         }
+    }
+
+    function buyAndRedeemBooster(string memory tier) public payable {
+        uint256 tokenID = buyBooster(tier);
+        redeemBooster(tokenID);
     }
 
     function getSupplierBoosters() public view returns (BoosterToken[] memory) {
