@@ -128,6 +128,7 @@ contract Supplier {
                 break;
             }
         }
+        booster.redeem(msg.sender, boosterID);
     }
 
     function buyAndRedeemBooster(string memory tier) public payable {

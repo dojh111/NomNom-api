@@ -82,7 +82,6 @@ export default class Food {
             '/food/:id',
             multer().none(),
             async (req: Request, res: Response) => {
-                console.log('here');
                 try {
                     const foodID = req.params.id;
                     // Retrieve details from database
@@ -105,7 +104,6 @@ export default class Food {
             '/restaurant/:name',
             multer().none(),
             async (req: Request, res: Response) => {
-                console.log('here');
                 try {
                     const name = req.params.name;
                     // Retrieve details from database

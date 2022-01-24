@@ -34,7 +34,7 @@ export default class RestaurantApi extends RestaurantHandler {
                         restaurantDescription: req.body.restaurantDescription,
                         restaurantImageUrl: req.body.restaurantImageUrl,
                         restaurantWalletAddress:
-                            req.body.restaurantWalletAddress,
+                            req.body.restaurantWalletAddress.toLowerCase(),
                         restaurantBooster: {
                             isBoosted: false,
                             boostTier: 0,
@@ -42,14 +42,6 @@ export default class RestaurantApi extends RestaurantHandler {
                         },
                     };
                     await this.collection.insertOne(restaurantData);
-                    console.log('HERE');
-
-                    // Temporarily apply booster
-                    // await this.applyBooster(
-                    //     req.body.restaurantWalletAddress,
-                    //     1643007493,
-                    //     3
-                    // );
 
                     console.log('APPLY OVER');
 

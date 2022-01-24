@@ -26,7 +26,7 @@ export default class RestaurantHandler {
             'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161';
         this.provider = new ethers.providers.JsonRpcProvider(rinkebyUrl);
         const boosterContractAddress =
-            '0x15446a549a0A683E6f93E41DbfaF70657F595B0c';
+            '0x0CfB757D1dc2B016Fb7F3de604CBB7bB7b0B621D';
         this.boosterContract = new ethers.Contract(
             boosterContractAddress,
             Supplier.abi,
@@ -47,7 +47,6 @@ export default class RestaurantHandler {
     public async searchDatabase(searchItem: any) {
         const searchResult = await this.collection.find(searchItem);
         const array = await searchResult.toArray();
-        console.log(array);
         return array;
     }
 
@@ -59,15 +58,14 @@ export default class RestaurantHandler {
     }
 
     public async applyBooster(
-        restaurantWalletAddress: string,
+        walletAddress: string,
         boostStartTime: any,
         boostTier: number
     ) {
-        console.log('APPLY BOOSTER');
-        const restaurantData: RestaurantData[] = await this.searchDatabase({
-            restaurantWalletAddress: restaurantWalletAddress,
+        console.log(`Searching for: ${walletAddress}`);
+        const restaurantData = await this.searchDatabase({
+            restaurantWalletAddress: walletAddress.toLowerCase(),
         });
-        console.log(restaurantData);
         const startDateTimeString =
             this.dateTimeParser.convertTimeFromUnix(boostStartTime);
 
@@ -96,14 +94,17 @@ export default class RestaurantHandler {
         restaurantBoostData.boostTier = boostTier;
         restaurantBoostData.boostExpiry = JSON.stringify(boostEndDate);
 
+        console.log(restaurantBoostData);
+
         await this.collection.updateOne(
             {
-                restaurantWalletAddress: restaurantWalletAddress,
+                restaurantWalletAddress: walletAddress.toLowerCase(),
             },
             {
                 $set: { restaurantBooster: restaurantBoostData },
             }
         );
+        console.log('RESTAURANT BOOSTED');
     }
 
     checkIsBoosterValid(restaurantData: RestaurantData, currentDate: Date) {
@@ -122,7 +123,8 @@ export default class RestaurantHandler {
         await this.collection.updateOne(
             {
                 restaurantName: restaurantData.restaurantName,
-                restaurantWalletAddress: restaurantData.restaurantWalletAddress,
+                restaurantWalletAddress:
+                    restaurantData.restaurantWalletAddress.toLowerCase(),
             },
             {
                 $set: { restaurantBooster: boosterData },
