@@ -170,7 +170,7 @@ export default class BlockchainTrackerApi extends BlockchainTracker {
         );
 
         router.get(
-            '/redeemedgifts/:walletAddress',
+            '/redeemedfood/:walletAddress',
             async (req: Request, res: Response) => {
                 try {
                     const userAddress = req.params.walletAddress;
