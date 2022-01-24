@@ -61,13 +61,6 @@ export default class SupplierActions {
         }
     }
 
-    public async generateId() {
-        const searchResult = await this.collection.find();
-        const array = await searchResult.toArray();
-        console.log(`Current length: ${array.length}`);
-        return array.length;
-    }
-
     public routes(router: express.Router): void {
         // POST create
         router.post(
@@ -77,7 +70,6 @@ export default class SupplierActions {
                 try {
                     // Set data into database
                     const supplierData: SupplierData = {
-                        _id: await this.generateId(),
                         supplierName: req.body.supplierName,
                         supplierPassword: req.body.supplierPassword,
                         supplierEmail: req.body.supplierEmail,
@@ -88,9 +80,16 @@ export default class SupplierActions {
                     // No repeats, proceed to insert
                     await this.checkForDuplicateAttributes(supplierData);
                     await this.collection.insertOne(supplierData);
+                    let returnData = await this.searchDatabase({
+                        supplierName: req.body.supplierName,
+                        supplierPassword: req.body.supplierPassword,
+                        supplierEmail: req.body.supplierEmail,
+                        supplierWalletAddress: req.body.supplierWalletAddress,
+                        supplierAddress: req.body.supplierAddress,
+                    });
                     res.send({
                         isOk: true,
-                        supplierProfile: supplierData,
+                        supplierProfile: returnData,
                         message: 'Supplier sign up successful',
                     }).status(200);
                     return;
